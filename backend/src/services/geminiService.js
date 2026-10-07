@@ -93,7 +93,7 @@ async function analyzeIncidentWithGemini({ title, description, location, type })
   try {
     if (GoogleGenerativeAI) {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
       const prompt = `You are an expert AI Operational Management Assistant.
 Analyze the following operational incident report and generate a structured operational response plan in valid JSON format.
@@ -154,7 +154,7 @@ async function generateOperationalReport(incident, resources = [], tasks = []) {
   if (apiKey && GoogleGenerativeAI) {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
       const prompt = `You are the Lead Operations Commander. Generate a crisp, executive situational command report in Markdown for the following incident:
 
