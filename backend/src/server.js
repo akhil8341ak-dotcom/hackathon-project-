@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
+const fs = require('fs');
 const connectDB = require('./config/db');
 const seedData = require('./utils/seedData');
 const errorHandler = require('./middleware/errorHandler');
@@ -39,6 +41,27 @@ app.post('/api/seed', async (req, res, next) => {
   }
 });
 
+// Serve production frontend assets & SPA client-side routing
+const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+
+if (process.env.NODE_ENV === 'production' || fs.existsSync(frontendDistPath)) {
+  console.log(`📁 Production mode enabled: Serving frontend from ${frontendDistPath}`);
+  app.use(express.static(frontendDistPath));
+
+  app.get('*', (req, res, next) => {
+    // Exclude API routes so non-existent API endpoints return JSON 404
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ message: `API endpoint not found: ${req.path}` });
+    }
+    const indexPath = path.join(frontendDistPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      next();
+    }
+  });
+}
+
 // Central Error Handler
 app.use(errorHandler);
 
@@ -55,3 +78,4 @@ const server = app.listen(PORT, async () => {
   await connectDB();
   await seedData();
 });
+
